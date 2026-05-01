@@ -7,10 +7,9 @@ const app = express();
 /* ---------------- CORS (FIXED PRODUCTION VERSION) ---------------- */
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: "*",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type"],
-  credentials: true
+  allowedHeaders: ["Content-Type"]
 }));
 
 app.options("*", cors());
