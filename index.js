@@ -4,21 +4,28 @@ const db = require("./db");
 
 const app = express();
 
-/* -------- MIDDLEWARE -------- */
+/* ---------------- CORS (FIXED PRODUCTION VERSION) ---------------- */
 
-// SIMPLE + RELIABLE CORS FIX (THIS IS ENOUGH)
-app.use(cors());
+app.use(cors({
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type"],
+  credentials: true
+}));
 
-// JSON parser
+app.options("*", cors());
+
+/* ---------------- BODY PARSER ---------------- */
+
 app.use(express.json());
 
-/* -------- BASIC -------- */
+/* ---------------- BASIC ---------------- */
 
 app.get("/", (req, res) => {
   res.send("Server running");
 });
 
-/* -------- AUTH -------- */
+/* ---------------- AUTH ---------------- */
 
 app.post("/signup", (req, res) => {
   const { email, password } = req.body;
@@ -27,7 +34,7 @@ app.post("/signup", (req, res) => {
     "INSERT INTO users (email, password) VALUES (?, ?)",
     [email, password],
     (err) => {
-      if (err) return res.send(err);
+      if (err) return res.status(500).send(err);
       res.send("Signup done");
     }
   );
@@ -40,7 +47,7 @@ app.post("/login", (req, res) => {
     "SELECT * FROM users WHERE email=? AND password=?",
     [email, password],
     (err, result) => {
-      if (err) return res.send(err);
+      if (err) return res.status(500).send(err);
 
       if (result.length > 0) {
         res.send("Login success");
@@ -51,7 +58,7 @@ app.post("/login", (req, res) => {
   );
 });
 
-/* -------- PROJECTS -------- */
+/* ---------------- PROJECTS ---------------- */
 
 app.post("/projects", (req, res) => {
   const { name } = req.body;
@@ -60,9 +67,9 @@ app.post("/projects", (req, res) => {
     "INSERT INTO projects (name) VALUES (?)",
     [name],
     (err, result) => {
-      if (err) return res.send(err);
+      if (err) return res.status(500).send(err);
 
-      res.send({
+      res.json({
         id: result.insertId,
         name
       });
@@ -72,12 +79,12 @@ app.post("/projects", (req, res) => {
 
 app.get("/projects", (req, res) => {
   db.query("SELECT * FROM projects", (err, result) => {
-    if (err) return res.send(err);
-    res.send(result);
+    if (err) return res.status(500).send(err);
+    res.json(result);
   });
 });
 
-/* -------- TASKS -------- */
+/* ---------------- TASKS ---------------- */
 
 app.post("/tasks", (req, res) => {
   const { title, projectId } = req.body;
@@ -86,9 +93,9 @@ app.post("/tasks", (req, res) => {
     "INSERT INTO tasks (title, status, projectId) VALUES (?, ?, ?)",
     [title, "TODO", projectId],
     (err, result) => {
-      if (err) return res.send(err);
+      if (err) return res.status(500).send(err);
 
-      res.send({
+      res.json({
         id: result.insertId,
         title,
         projectId,
@@ -100,8 +107,8 @@ app.post("/tasks", (req, res) => {
 
 app.get("/tasks", (req, res) => {
   db.query("SELECT * FROM tasks", (err, result) => {
-    if (err) return res.send(err);
-    res.send(result);
+    if (err) return res.status(500).send(err);
+    res.json(result);
   });
 });
 
@@ -110,7 +117,7 @@ app.put("/tasks/:id", (req, res) => {
     "UPDATE tasks SET status=? WHERE id=?",
     [req.body.status, req.params.id],
     (err) => {
-      if (err) return res.send(err);
+      if (err) return res.status(500).send(err);
       res.send("Task updated");
     }
   );
@@ -121,27 +128,27 @@ app.delete("/tasks/:id", (req, res) => {
     "DELETE FROM tasks WHERE id=?",
     [req.params.id],
     (err) => {
-      if (err) return res.send(err);
+      if (err) return res.status(500).send(err);
       res.send("Task deleted");
     }
   );
 });
 
-/* -------- DASHBOARD -------- */
+/* ---------------- DASHBOARD ---------------- */
 
 app.get("/dashboard", (req, res) => {
   db.query("SELECT * FROM tasks", (err, tasks) => {
-    if (err) return res.send(err);
+    if (err) return res.status(500).send(err);
 
     const total = tasks.length;
     const done = tasks.filter(t => t.status === "DONE").length;
     const pending = tasks.filter(t => t.status !== "DONE").length;
 
-    res.send({ total, done, pending });
+    res.json({ total, done, pending });
   });
 });
 
-/* -------- SERVER -------- */
+/* ---------------- SERVER ---------------- */
 
 const PORT = process.env.PORT || 5000;
 
