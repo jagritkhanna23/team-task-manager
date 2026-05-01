@@ -6,14 +6,10 @@ const app = express();
 
 /* -------- MIDDLEWARE -------- */
 
-app.use(cors({
-  origin: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type"]
-}));
+// SIMPLE + RELIABLE CORS FIX (THIS IS ENOUGH)
+app.use(cors());
 
-app.options("*", cors());
-
+// JSON parser
 app.use(express.json());
 
 /* -------- BASIC -------- */
