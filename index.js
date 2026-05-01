@@ -1,23 +1,29 @@
+const express = require("express");
 const cors = require("cors");
-app.options("*", cors());
+const db = require("./db");
+
+const app = express();
+
+/* -------- MIDDLEWARE (MUST BE TOP) -------- */
+
 app.use(cors({
   origin: "http://localhost:3000",
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  credentials: true
+  allowedHeaders: ["Content-Type"]
 }));
-const express = require("express");
-const app = express();
 
-const db = require("./db");
+app.options("*", cors());
 
 app.use(express.json());
 
 /* -------- BASIC -------- */
+
 app.get("/", (req, res) => {
   res.send("Server running");
 });
 
-/* -------- AUTH (still simple) -------- */
+/* -------- AUTH -------- */
+
 app.post("/signup", (req, res) => {
   const { email, password } = req.body;
 
@@ -50,6 +56,7 @@ app.post("/login", (req, res) => {
 });
 
 /* -------- PROJECTS -------- */
+
 app.post("/projects", (req, res) => {
   const { name } = req.body;
 
@@ -75,6 +82,7 @@ app.get("/projects", (req, res) => {
 });
 
 /* -------- TASKS -------- */
+
 app.post("/tasks", (req, res) => {
   const { title, projectId } = req.body;
 
@@ -124,6 +132,7 @@ app.delete("/tasks/:id", (req, res) => {
 });
 
 /* -------- DASHBOARD -------- */
+
 app.get("/dashboard", (req, res) => {
   db.query("SELECT * FROM tasks", (err, tasks) => {
     if (err) return res.send(err);
@@ -137,6 +146,7 @@ app.get("/dashboard", (req, res) => {
 });
 
 /* -------- SERVER -------- */
+
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
