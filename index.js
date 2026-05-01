@@ -4,10 +4,10 @@ const db = require("./db");
 
 const app = express();
 
-/* -------- MIDDLEWARE (MUST BE TOP) -------- */
+/* -------- MIDDLEWARE -------- */
 
 app.use(cors({
-  origin: "http://localhost:3000",
+  origin: true,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type"]
 }));
