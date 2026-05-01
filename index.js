@@ -1,8 +1,12 @@
 const cors = require("cors");
+
+app.use(cors({
+  origin: "*"
+}));
 const express = require("express");
 const app = express();
-app.use(cors());
- origin: "http://localhost:3000"
+//app.use(cors());
+ //origin: "http://localhost:3000"
 const db = require("./db");
 
 app.use(express.json());
